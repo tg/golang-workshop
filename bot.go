@@ -44,6 +44,7 @@ func (h *SlackHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	if q.Get("token") != os.Getenv("BOT_TOKEN") {
 		log.Println("invalid token")
+		http.Error(w, "bad token", http.StatusForbidden)
 		return
 	}
 
