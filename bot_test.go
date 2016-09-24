@@ -10,7 +10,7 @@ import (
 
 func TestSlackHandler(t *testing.T) {
 	// Create a request
-	data := strings.NewReader("token=secret&user_name=gopher")
+	data := strings.NewReader("token=secret&user_name=gopher&text=my%20code%20is%20the%20best")
 	r, _ := http.NewRequest("POST", "http://test.com", data)
 
 	// Set matching BOT_TOKEN
@@ -53,5 +53,15 @@ func TestSlackHandler_bad_token(t *testing.T) {
 	// Check forbidden
 	if w.Code != http.StatusForbidden {
 		t.Fatal(w.Code, w.Body.String())
+	}
+}
+
+func TestReplaceWord(t *testing.T) {
+	w, err := replaceWord("code")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if w == "" || w == "code" {
+		t.Error(w)
 	}
 }

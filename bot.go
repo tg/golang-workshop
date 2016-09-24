@@ -14,6 +14,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strings"
 )
 
 // Response structure serialisable to JSON
@@ -22,6 +23,42 @@ type Response struct {
 }
 
 type SlackHandler struct {
+}
+
+func replaceWord(word string) (string, error) {
+	// Fetch the URL
+	resp, err := http.Get("http://workshop.x7467.com:1080/" + word)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	// If 404, not such word in the dictionary
+	if resp.StatusCode == http.StatusNotFound {
+		return "", nil
+	}
+
+	// Otherwise expecting 200 OK
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("dict status: %s", resp.Status)
+	}
+
+	// Decode response
+	var parsed struct {
+		Synonyms []string `json:"synonyms"`
+	}
+	err = json.NewDecoder(resp.Body).Decode(&parsed)
+
+	if err != nil {
+		return "", err
+	}
+
+	// If found anything, return the first one
+	if s := parsed.Synonyms; len(s) > 0 {
+		return s[0], nil
+	}
+
+	return "", nil
 }
 
 // ServeHTTP reads message from Slack and respond with greetings
@@ -48,9 +85,26 @@ func (h *SlackHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Get text of incoming message
+	text := q.Get("text")
+
+	// Replace words, keep in []string
+	var words []string
+	for _, word := range strings.Split(text, " ") {
+		newWord, err := replaceWord(word)
+		if err != nil {
+			log.Printf("%s: %s", newWord, err)
+		}
+
+		if newWord == "" {
+			newWord = word
+		}
+		words = append(words, newWord)
+	}
+
 	// Send personalised response
 	json.NewEncoder(w).Encode(&Response{
-		Text: fmt.Sprintf("Hello %s, how are you?", q.Get("user_name")),
+		Text: strings.Join(words, " "),
 	})
 }
 
