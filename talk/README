@@ -1,0 +1,17 @@
+Slides presented during the workshop
+==
+
+You need go present tool in order to play these slides.
+
+Assuming you have go installed, you can fetch the tool using the following command:
+
+	go get -u godoc.org/golang.org/x/tools/cmd/present
+
+Then simply run it in this directory:
+
+	$ present
+	2016/09/26 14:47:09 Open your web browser and visit http://127.0.0.1:3999
+
+And visit the URL in your browser:
+
+	http://127.0.0.1:3999/workshop.slide

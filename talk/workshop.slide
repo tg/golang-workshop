@@ -1,0 +1,630 @@
+Let's Go and build a Slack bot
+Workshop for first time gophers
+24 Sep 2016
+
+Tomasz Grodzki
+Co-Founder & Developer, AlphaSOC
+tomasz@alphasoc.com
+
+# https://github.com/tg
+
+* I want my Internet!
+
+*SSID:* Infusion Guest
+*Pass:* InfusionGuest
+
+.image workshop/gopherswrench.jpg _ 600
+
+* Join Slack
+
+Slack: [[https://golangworkshop.slack.com]] (via email invitation)
+
+* Agenda
+
+- Session 1: implement HTTP server talking in JSON (baby bot)
+- Session 2: test, fix, benchmark, deploy, talk (adolescence)
+- Session 3: make the bot to do something sensible (education)
+- Session 4: sensible is not enough, make it fast! (real job)
+
+* Life
+
+- Why is this is guy talking so long? I want to code!
+- Yeah, I code like a pro!
+- This language is weird, it should have compiled...
+- Maybe I'm using some old version, let me check.
+- Oooo, there's a typo! And lunch time.
+- Where is the Internet? Call ISP now!
+- My bot is the best, it just doesn't talk too much...
+- 🍺
+
+* Why should I care about a new language?
+
+Language is a tool.
+
+There are many problems to solve.
+
+New languages are designed for a reason.
+
+No backwards compatibility.
+
+* Is Go the right choice?
+
+Yes
+
+* Why Go?
+
+* Language Design in the Service of Software Engineering
+
+"The problems introduced by *multicore* processors, *networked* systems, massive computation *clusters*, and the *web* programming model were being worked around rather than addressed head-on."
+
+"Go is a programming language designed by Google to help solve Google's problems, and Google has big problems."
+
+"Go is efficient, scalable, and productive. Some programmers find it fun to work in; others find it unimaginative, even boring."
+
+Rob Pike's [[http://talks.golang.org/2012/splash.article][article]] from October 2012.
+
+* Open source
+
+Go's entire history is on GitHub.
+
+The very first commit (now git hash `18c5b48`):
+
+        Author: Robert Griesemer <gri@golang.org>
+        Date:   Sun Mar 2 20:47:34 2008 -0800
+
+            Go spec starting point.
+
+
+
+* Fast builds
+
+Focus on work
+
+.image workshop/xkcd_compiling.png
+.caption [[https://xkcd.com/303/][xkcd]]
+
+* Simple (25 reserved words)
+
+.image workshop/so_keywords.png
+.caption Stack Overflow: [[http://stackoverflow.com/a/4980785/847869][Reserved keywords count by programming language?]]
+
+* Statically typed
+
+"Ut compilare, et idcirco ego operor." (I compile, therefore I work.)
+
+No implicit casting:
+
+	var (
+		large int64 = 42
+		small int16
+	)
+
+	small = large        // Compile error!
+	small = int16(large) // I know what I'm doing
+
+* Statically build
+
+No dependencies.
+
+Larger binaries, but easy to deploy.
+
+Build and run anywhere.
+
+Easy cross-platform compilation.
+
+* Great tooling
+
+	$ go [tool]
+
+		build       compile packages and dependencies
+		run         compile and run Go program
+		test        test packages
+
+		get         download and install packages and dependencies
+		install     compile and install packages and dependencies
+
+		fmt         run gofmt on package sources
+		doc         show documentation for package or symbol
+		vet         run go tool vet on packages
+
+		clean       remove object files
+		env         print Go environment information
+		fix         run go tool fix on packages
+		generate    generate Go files by processing source
+		list        list packages
+
+Many others due to a easy-parseable syntax.
+
+* Excellent stdlib (in pure Go)
+
+- production ready http.Server
+- cryptography (TLS, AES, RSA, HMAC, SHA, MD5)
+- compression (gzip, zlib, lzw, bzip2, flate)
+- filesystem modifications, subprocesses, system calls
+- IO readers, writers, seekers, pipes
+- SQL interface (third-party drivers needed)
+- time, date
+- http reverse proxy
+
+More: [[https://golang.org/pkg/]]
+
+* Built-in concurrency
+
+- green threads (go routines)
+- can run hundreds of thousands routines
+- low overhead (dynamic stack)
+- channels for communication
+- scalable model
+
+* Clear dependencies
+
+	import (
+
+		// standard library:
+
+		"fmt"
+		"net/http"
+
+		// third-party:
+
+		"github.com/digitalocean/godo" // client for digitalocean
+		"golang.org/x/oauth2"          // oauth2 package
+	)
+
+* Consistent documentation
+
+- stdlib: [[https://golang.org/pkg/]]
+- third-party: [[https://godoc.org/]]{import-path}
+
+Command line tool:
+
+	$ go doc http.Server.ListenAndServe
+	func (srv *Server) ListenAndServe() error
+
+	    ListenAndServe listens on the TCP network address srv.Addr and then calls
+	    Serve to handle requests on incoming connections. If srv.Addr is blank,
+	    ":http" is used.
+
+Run local server:
+
+	$ godoc -http=:6060
+
+* Great for sharing
+
+Publish code to github, gitlab, bitbucket etc.
+
+It should be now "go gettable".
+
+Install:
+
+	$ go get -u github.com/kardianos/govendor
+	...
+	$ govendor -version
+	v1.0.7
+
+Placed in your $GOPATH:
+
+	$ which govendor
+	/Users/tg/dev/go/bin/govendor
+
+	$ echo $GOPATH
+	/Users/tg/dev/go
+
+
+* Everything is on GitHub
+
+.image workshop/github_by_lang.png
+
+* Trendy
+
+.image workshop/trend.png
+.caption Google Trends for [[http://www.google.com/trends/explore#q=golang][golang]]
+
+* Many users
+
+- Google
+- Facebook, Twitter
+- Dropbox
+- GitHub, Bitbucket
+- Digital Ocean, Heroku, Kubernetes, CoreOS, Docker
+- eBay, SoundCloud, Tumblr
+- GOV.UK
+- New York Times,
+- Mozilla
+- ...
+
+.link http://golang.org/wiki/GoUsers
+
+* Why NOT use Go?
+
+Because you don't like it?
+
+You'll figure it out.
+
+* Sounds good, give me some code!
+
+* Setting up the environment
+
+	$GOPATH/
+		src/
+		pkg/
+		bin/
+
+Projects should live within `$GOPATH/src`.
+
+Worth adding `$GOPATH/bin` to `$PATH`.
+
+
+* Install
+
+- [[golang.org/doc/install]]
+- or use package manager
+
+* Hello world
+
+.play workshop/hello.go
+
+* Hello UTF-8
+
+.play workshop/hello_utf.go
+
+* Hello Internet!
+
+.play workshop/hello_http.go
+
+* Multiplexer
+
+.play workshop/http_muxer.go
+
+* Proper handler
+
+.play workshop/http_handler.go
+
+* Reading request body
+
+.play workshop/http_copy.go
+
+* Capture request body
+
+.play workshop/http_copy_string.go /ServeHTTP/,/^}/
+
+* Parsing URL
+
+Package [[https://golang.org/pkg/net/url][net/url]] for manipulating URLs of the form:
+
+	scheme://[userinfo@]host/path[?query][#fragment]
+
+Access `query` within URL:
+
+	func (u *URL) Query() Values
+
+Parse raw query:
+
+	q, err := url.ParseQuery("user=bob%20marley&pass=green123")
+	user := q.Get("user") // "bob marley"
+
+* Logging
+
+.play workshop/logging.go
+
+* Environment variables
+
+.play workshop/env.go
+
+* JSON marshaler
+
+.play workshop/json_marshal.go
+
+* JSON encoder
+
+.play workshop/json_encoder.go
+
+* JSON fields
+
+.play workshop/json_fields.go
+
+* Enough! I want my bot!
+
+* Coding Round 1
+
+Requirements:
+
+- HTTP server listening on `$BOT_ADDR` if present (e.g. "localhost:1234")
+- API compatible with [[https://api.slack.com/outgoing-webhooks]]
+- Make them gentlemen (🎩)
+
+Extras:
+- Token validation for incoming requests ($BOT_TOKEN)
+- Logging (who when what)
+- Error handling (e.g. 400 Bad Request on invalid input data)
+
+Packages:
+
+- [[https://golang.org/pkg/net/http][net/http]], [[https://golang.org/pkg/net/url][net/url]], [[https://golang.org/pkg/encoding/json][encoding/json]], [[https://golang.org/pkg/log][log]], [[https://golang.org/pkg/fmt][fmt]], [[https://golang.org/pkg/bytes][bytes]], [[https://golang.org/pkg/strings][strings]]
+
+* Testing Go code
+
+* Creating a test file
+
+Tests are placed in `*_test.go` files.
+
+	$GOPATH/src/package/
+		main.go
+		main_test.go
+
+* Writing a test
+
+	package party
+
+	import "testing"
+
+	func TestBeer(t *testing.T) {
+		if !FridgeContains("beer") {
+			t.Fatal("expected some cold beer")
+		}
+	}
+
+Test functions must be of the form:
+
+	func TestXxx(*testing.T)
+
+* Running tests
+
+Any package:
+
+	$ go test github.com/rihanna/party
+
+Current package:
+
+	$ go test .
+
+Including subpackages:
+
+	$ go test ./...
+
+* Hoping for the best
+
+No luck:
+
+	$ go test
+	--- FAIL: TestBeer (0.00s)
+	  party_test.go:11: expected some cold beer
+	FAIL
+	FAIL rihanna.com/party 0.010s
+
+I'm an amazing programmer (and know how to dance):
+
+	$ go test github.com/rihanna/party
+	ok github.com/rihanna/party 0.008s
+
+	$ go test github.com/rihanna/party/...
+	ok github.com/rihanna/party 0.020s
+	ok github.com/rihanna/partydancefloor 0.019s
+
+* Test object
+
+[[https://golang.org/pkg/testing/#T][*testing.T]] passed to every test.
+
+Can be used to mark tests as failed or just log some output.
+
+	type T
+	    func (c *T) Error(args ...interface{})
+	    func (c *T) Errorf(format string, args ...interface{})
+
+	    func (c *T) Fatal(args ...interface{})
+	    func (c *T) Fatalf(format string, args ...interface{})
+
+	    func (c *T) Log(args ...interface{})
+	    func (c *T) Logf(format string, args ...interface{})
+		...
+
+* (Testing by) example
+
+* Writing an example
+
+	func ExampleHandsUp() {
+
+		fmt.Println(HandsUp("o oo o"))
+
+		// Output:
+		// \o/ \o/\o/ \o/
+	}
+
+* Naming convention
+
+Use it to automatically include examples in documentation:
+
+	func Example() { ... }    // package
+	func ExampleF() { ... }   // function
+	func ExampleT() { ... }   // type
+	func ExampleT_M() { ... } // method M on type T
+
+Multiple examples can be provided by adding unique suffix:
+
+	func Example_suffix() { ... }
+	func ExampleF_suffix() { ... }
+	func ExampleT_suffix() { ... }
+	func ExampleT_M_suffix() { ... }
+
+* It's there!
+
+[[https://godoc.org/strings#Split]]
+.image workshop/split_doc.png
+
+* Benchmarks
+
+Follow the scheme (again):
+
+	func BenchmarkHeadSpin(b *testing.B) {
+	    for i := 0; i < b.N; i++ {
+			HeadSpin()
+		}
+	}
+
+Remember about the loop!
+
+* Run benchmarks
+
+Not run by default, needs a flag:
+
+	$ go test -bench .
+	PASS
+	BenchmarkHeadSpin   10000       148475 ns/op
+	BenchmarkDrinkBeer      1   3354617382 ns/op
+	ok github.com/rihanna/party   4.876s
+
+* Additional testing packages
+
+- [[https://golang.org/pkg/testing/httptest][testing/httptest]]
+- [[https://golang.org/pkg/testing/iotest][testing/iotest]]
+- [[https://golang.org/pkg/testing/quick][testing/quick]] – black box testing
+
+* Testing an HTTP handler
+
+	// Some handler we want to test
+	handler := func(w http.ResponseWriter, r *http.Request) {
+	   http.Error(w, "Uh huh", http.StatusBadRequest)
+	}
+
+	// Create a request
+	r, err := http.NewRequest("GET", "http://test.com", nil)
+
+	// Handle request and store result in w
+	w := httptest.NewRecorder()
+	handler(w, r)
+
+	// Check out
+	if w.Code != http.StatusOK {
+	   t.Fatal(w.Code, w.Body.String())
+	}
+
+* Documentation
+
+[[https://golang.org/pkg/testing/]]
+
+* Make it happen!
+
+* Coding Round 2
+
+Requirements:
+
+- Write unit test for your handler (and make it `PASS`)
+- Deploy to server
+- Enjoy your bot
+
+Extras:
+
+- Test by example
+- Create a benchmark
+
+Packages:
+
+- [[https://golang.org/pkg/testing][testing]], [[https://golang.org/pkg/testing/httptest][testing/httptest]]
+
+* Deployment
+
+Get your endpoint from Slack:
+
+	/iwantmybox
+
+Build for the right platform:
+
+	$ GOOS=linux GOARCH=amd64 go build -v
+
+Deploy:
+
+	$ scp mybot workshop.x7467.com:
+
+Run:
+
+	$ ssh workshop
+	workshop$ ./mybot
+
+* Making an HTTP request
+
+.play workshop/http_request.go /main_start/,/main_end/
+
+* Setting a timeout
+
+.play workshop/http_request_timeout.go /func/,$
+
+* String manipulation
+
+Package [[https://golang.org/pkg/strings][strings]] contains string "methods".
+
+	strings.ToUpper("i love my bot")          // I LOVE MY BOT
+	strings.Split("i love my bot", " ")       // ["i" "love" "my" "bot"]
+	strings.Count("i love my bot", "o")       // 2
+	strings.Join([]string{"go", "lang"}, "_") // "go_lang"
+
+Same in [[https://golang.org/pkg/bytes][bytes]] package, but operates on `[]byte`.
+
+* Coding Round 3
+
+Requirements:
+
+- Replace every word in incoming message using remote dictionary
+
+Extras:
+
+- Do not replace words with phrases (multiple words)
+- Timeout requests over 1 second, retry
+
+Packages:
+
+- [[https://golang.org/pkg/net/http][net/http]], [[https://golang.org/pkg/bytes][bytes]], [[https://golang.org/pkg/strings][strings]]
+
+* Dictionary
+
+Fetch over HTTP:
+
+	GET http://workshop.x7467.com:1080/code
+
+JSON response:
+
+	{
+		"word": "code",
+		"synonyms": ["cipher", "secret language", "cryptogram"]
+	}
+
+Status code `404` if word doesn't exists.
+
+* Goroutines and channels
+
+* Spawning a goroutine
+
+.play workshop/goroutine.go
+
+Goroutines terminates on exit (main goroutine).
+
+* Spawning multiple goroutines
+
+.play workshop/goroutine_many.go /func/,$
+
+* Watch out bindings of variables
+
+.play workshop/goroutine_binding.go /func/,$
+
+Tiger ate everyone?
+
+* Channels
+
+.play workshop/channel.go /func/,$
+
+* Collecting from workers
+
+.play workshop/channel_collect.go /func/,$
+
+* Ticker
+
+.play workshop/channel_tick.go /func/,$
+
+* Coding Round 4
+
+Requirements:
+
+- Speed up dictionary lookups by using go routines
+
+Extras:
+
+- Implement rate limiting using channels
