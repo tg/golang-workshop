@@ -1,3 +1,7 @@
 This is an example implementation of the Slack Bot we were building on the workshop.
 
-It doesn't contain go routines yet, but will add it soon.
+bot.go contains the CLI tool which uses textconv subpackage for manipulating text.
+
+Documentation for textconv can be seen here:
+
+	https://godoc.org/github.com/tg/golang-workshop/bot/textconv
