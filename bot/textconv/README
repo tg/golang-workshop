@@ -1,0 +1,11 @@
+Package textconv implements text conversions for the slack bot, including synonym fetcher and parallel executor.
+
+Docs: https://godoc.org/github.com/tg/golang-workshop/bot/textconv
+
+If you want to run benchmarks:
+
+	$ go test ./... -bench=.
+
+	BenchmarkSynonymTextConverter-2            	      50	  38981487 ns/op
+	BenchmarkSynonymTextConverter_parallel-2   	     500	   2634678 ns/op
+	PASS
