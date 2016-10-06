@@ -1,6 +1,7 @@
 package textconv
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 )
@@ -17,4 +18,14 @@ func TestParallelTextConverter(t *testing.T) {
 	if got != "CZEŚĆ, MY NAME IS DR. GREENTHUMB!" {
 		t.Error(got)
 	}
+}
+
+func ExampleStringMapFunc() {
+	c := StringMapFunc(strings.ToUpper)
+	txt, _ := c.ConvertText("what's up?")
+
+	fmt.Println(txt)
+
+	// Output:
+	// WHAT'S UP?
 }
