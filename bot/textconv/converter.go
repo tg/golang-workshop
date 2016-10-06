@@ -1,3 +1,5 @@
+// Package textconv implements text conversions for the slack bot,
+// including synonym fetcher and parallel executor.
 package textconv
 
 import "strings"
