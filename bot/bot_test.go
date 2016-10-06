@@ -19,16 +19,18 @@ func TestSlackHandler(t *testing.T) {
 	// Handle request and store result in w
 	w := httptest.NewRecorder()
 
-	handler := &SlackHandler{}
+	handler := NewSlackHandler(&ToUpperTextConverter{})
 	handler.ServeHTTP(w, r)
-
-	// Log response (so it can be viewed with "go test -v")
-	response := w.Body.String()
-	t.Log(response)
 
 	// Check code
 	if w.Code != http.StatusOK {
 		t.Fatal(w.Code, w.Body.String())
+	}
+
+	// Check response (after trimming new line which is appended to JSON)
+	response := strings.TrimRight(w.Body.String(), "\n")
+	if response != `{"text":"MY CODE IS THE BEST"}` {
+		t.Fatal(response)
 	}
 }
 
@@ -43,25 +45,12 @@ func TestSlackHandler_bad_token(t *testing.T) {
 	// Handle request and store result in w
 	w := httptest.NewRecorder()
 
-	handler := &SlackHandler{}
+	// We pass nil converter as it shouldn't be called anyway (will panic if it does)
+	handler := NewSlackHandler(nil)
 	handler.ServeHTTP(w, r)
-
-	// Log response (so it can be viewed with "go test -v")
-	response := w.Body.String()
-	t.Log(response)
 
 	// Check forbidden
 	if w.Code != http.StatusForbidden {
 		t.Fatal(w.Code, w.Body.String())
-	}
-}
-
-func TestReplaceWord(t *testing.T) {
-	w, err := replaceWord("code")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if w == "" || w == "code" {
-		t.Error(w)
 	}
 }
