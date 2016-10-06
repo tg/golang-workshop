@@ -1,4 +1,4 @@
-package main
+package textconv
 
 import (
 	"encoding/json"

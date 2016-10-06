@@ -1,4 +1,4 @@
-package main
+package textconv
 
 import "strings"
 
@@ -7,6 +7,18 @@ import "strings"
 type TextConverter interface {
 	// ConvertText takes text and replaces it with something else.
 	ConvertText(text string) (string, error)
+}
+
+// StringMapFunc is a helper type implementing TextConverter
+// by calling the string->string function and returning a nil error.
+// This is helpful if we want to use some functions from strings package,
+// for example StringMapFunc(strings.ToUpper) will yield TextConverter
+// converting text to its upper case version.
+type StringMapFunc func(string) string
+
+// ConvertText calls underlying function.
+func (c StringMapFunc) ConvertText(text string) (string, error) {
+	return c(text), nil
 }
 
 // ParallelTextConverter splits text into chunks and convert them in parallel using
