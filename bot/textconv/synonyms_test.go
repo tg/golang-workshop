@@ -34,7 +34,7 @@ func (s *TestSynonymizer) Synonyms(word string) ([]string, error) {
 	return []string{nw}, s.Err
 }
 
-// SynonymizerHandler returns synonyms for a word using WorkshopSynonymizer protocol.
+// SynonymizerHandler returns synonyms for a word using HTTPSynonymizer protocol.
 type SynonymizerHandler struct {
 	// Synonymizer will be used for fetching synonyms
 	Synonymizer Synonymizer
@@ -57,7 +57,7 @@ func (h *SynonymizerHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func TestWorkshopSynonymizer(t *testing.T) {
+func TestHTTPSynonymizer(t *testing.T) {
 	// Run synonym server returning upper-cased words as synonyms
 	server := httptest.NewServer(&SynonymizerHandler{
 		Synonymizer: &TestSynonymizer{
@@ -66,7 +66,7 @@ func TestWorkshopSynonymizer(t *testing.T) {
 	})
 	defer server.Close()
 
-	s := &WorkshopSynonymizer{URL: server.URL}
+	s := &HTTPSynonymizer{URL: server.URL}
 
 	got, err := s.Synonyms("gopher")
 	if err != nil {
