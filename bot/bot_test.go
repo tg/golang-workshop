@@ -6,6 +6,8 @@ import (
 	"os"
 	"strings"
 	"testing"
+
+	"github.com/tg/golang-workshop/bot/textconv"
 )
 
 func TestSlackHandler(t *testing.T) {
@@ -19,7 +21,8 @@ func TestSlackHandler(t *testing.T) {
 	// Handle request and store result in w
 	w := httptest.NewRecorder()
 
-	handler := NewSlackHandler(&ToUpperTextConverter{})
+	// Create handler converting text to upper case
+	handler := NewSlackHandler(textconv.StringMapFunc(strings.ToUpper))
 	handler.ServeHTTP(w, r)
 
 	// Check code

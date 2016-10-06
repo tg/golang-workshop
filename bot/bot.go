@@ -13,6 +13,9 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"time"
+
+	"github.com/tg/golang-workshop/bot/textconv"
 )
 
 // Response structure serialisable to JSON
@@ -23,11 +26,11 @@ type Response struct {
 // SlackHandler responing to incoming messages
 type SlackHandler struct {
 	// Converter will be used for converting incoming messages and send as a response.
-	converter TextConverter
+	converter textconv.TextConverter
 }
 
 // NewSlackHandler returns new SlackHandler which uses specific TextConverter.
-func NewSlackHandler(c TextConverter) *SlackHandler {
+func NewSlackHandler(c textconv.TextConverter) *SlackHandler {
 	return &SlackHandler{c}
 }
 
@@ -77,18 +80,23 @@ func main() {
 		addr = ":8080"
 	}
 
-	// Text converter used by bot.
-	var converter TextConverter
+	// Text converter used by bot
+	var converter textconv.TextConverter
 
 	// We'll use synonym converter using synonymizer over HTTP.
-	converter = &SynonymTextConverter{
-		Synonymizer: &WorkshopSynonymizer{
+	converter = &textconv.SynonymTextConverter{
+		Synonymizer: &textconv.HTTPSynonymizer{
+			// URL for making HTTP calls. If empty, default will be used.
 			URL: "",
+			// Use HTTP client with 5sec timeout
+			Client: http.Client{
+				Timeout: 5 * time.Second,
+			},
 		},
 	}
 
 	// And wrap it with parallelizer to make fast!
-	converter = NewParallelTextConverter(converter, " ")
+	converter = textconv.NewParallelTextConverter(converter, " ")
 
 	// Run the server
 	log.Fatal(http.ListenAndServe(addr, NewSlackHandler(converter)))

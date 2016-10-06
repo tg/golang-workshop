@@ -15,9 +15,9 @@ type Synonymizer interface {
 	Synonyms(word string) ([]string, error)
 }
 
-// WorkshopSynonymizer implements fetching synonyms via HTTP requests as described on the workshop.
+// HTTPSynonymizer implements fetching synonyms via HTTP requests as described on the workshop.
 // Synonyms are being fetched by querying URL/{word} and expects.
-type WorkshopSynonymizer struct {
+type HTTPSynonymizer struct {
 	// Base URL used for fetching synonyms
 	URL string
 
@@ -26,7 +26,7 @@ type WorkshopSynonymizer struct {
 }
 
 // Synonyms will fetch synonyms from URL.
-func (s *WorkshopSynonymizer) Synonyms(word string) ([]string, error) {
+func (s *HTTPSynonymizer) Synonyms(word string) ([]string, error) {
 	url := s.URL
 	// If URL not specified use default
 	if url == "" {
