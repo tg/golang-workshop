@@ -5,7 +5,7 @@ You need go present tool in order to play these slides.
 
 Assuming you have go installed, you can fetch the tool using the following command:
 
-	go get -u godoc.org/golang.org/x/tools/cmd/present
+	go get -u golang.org/x/tools/cmd/present
 
 Then simply run it in this directory:
 
