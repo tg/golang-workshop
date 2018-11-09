@@ -546,11 +546,11 @@ Packages:
 
 - [[https://golang.org/pkg/net/http][net/http]], [[https://golang.org/pkg/encoding/json][encoding/json]], [[https://golang.org/pkg/bytes][bytes]], [[https://golang.org/pkg/strings][strings]]
 
-* Dictionary
+* Remote dictionary
 
 Fetch over HTTP:
 
-	GET http://workshop.x7467.com:1080/code
+	GET http://dict.x7467.com/code
 
 JSON response:
 
