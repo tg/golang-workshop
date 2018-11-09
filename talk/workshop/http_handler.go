@@ -15,8 +15,7 @@ func (h *MyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	http.Handle("/", &MyHandler{
+	log.Fatal(http.ListenAndServe(":8080", &MyHandler{
 		Greeting: "Yo",
-	})
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	}))
 }

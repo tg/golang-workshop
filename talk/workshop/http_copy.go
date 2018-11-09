@@ -14,6 +14,6 @@ func (h *CopyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	http.Handle("/", &CopyHandler{})
+	http.Handle("/echo", &CopyHandler{})
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }

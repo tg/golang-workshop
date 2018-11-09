@@ -1,6 +1,6 @@
-Let's Go and build a Slack bot
+Let's Go and build a (concurrent) web server
 Workshop for first time gophers
-24 Sep 2016
+10 Nov 2018
 
 Tomasz Grodzki
 Co-Founder & Developer, AlphaSOC
@@ -10,32 +10,30 @@ tomasz@alphasoc.com
 
 * I want my Internet!
 
-*SSID:* Infusion Guest
-*Pass:* InfusionGuest
+*SSID:* Campus Community
+*Pass:* campusmadrid
 
 .image workshop/gopherswrench.jpg _ 600
 
-* Join Slack
-
-Slack: [[https://golangworkshop.slack.com]] (via email invitation)
-
 * Agenda
 
-- Session 1: implement HTTP server talking in JSON (baby bot)
-- Session 2: test, fix, benchmark, deploy, talk (adolescence)
-- Session 3: make the bot to do something sensible (education)
-- Session 4: sensible is not enough, make it fast! (real job)
+- Session 0: A few words about Go
+- Session 1: Implement a basic HTTP server
+- Session 2: Test it, fix it, benchmark it
+- Session 3: Make the server to do something sensible
+- Session 4: Sensible is not enough, make it fast!
 
-* Life
+* Reality...
 
 - Why is this is guy talking so long? I want to code!
 - Yeah, I code like a pro!
-- This language is weird, it should have compiled...
-- Maybe I'm using some old version, let me check.
-- Oooo, there's a typo! And lunch time.
-- Where is the Internet? Call ISP now!
-- My bot is the best, it just doesn't talk too much...
-- 🍺
+- This is not compiling, there must a bug in Go.
+- These slides are weird.
+- What is the WiFi password again?
+- My server is working!
+- My server is crashing!
+- It's working again!
+- I'm hungry...
 
 * Why should I care about a new language?
 
@@ -45,7 +43,7 @@ There are many problems to solve.
 
 New languages are designed for a reason.
 
-No backwards compatibility.
+No need for backwards compatibility.
 
 * Is Go the right choice?
 
@@ -63,30 +61,25 @@ Yes
 
 Rob Pike's [[http://talks.golang.org/2012/splash.article][article]] from October 2012.
 
+* Simple (25 reserved words)
+
+.image workshop/so_keywords.png
+.caption Stack Overflow: [[http://stackoverflow.com/a/4980785/847869][Reserved keywords count by programming language?]]
+
 * Open source
 
-Go's entire history is on GitHub.
+Go's entire history is on GitHub:
 
-The very first commit (now git hash `18c5b48`):
+[[https://github.com/golang/go]]
+
+The very first commit:
 
         Author: Robert Griesemer <gri@golang.org>
         Date:   Sun Mar 2 20:47:34 2008 -0800
 
             Go spec starting point.
 
-
-
-* Fast builds
-
-Focus on work
-
-.image workshop/xkcd_compiling.png
-.caption [[https://xkcd.com/303/][xkcd]]
-
-* Simple (25 reserved words)
-
-.image workshop/so_keywords.png
-.caption Stack Overflow: [[http://stackoverflow.com/a/4980785/847869][Reserved keywords count by programming language?]]
+Over 38k commits, 1.2k contributors.
 
 * Statically typed
 
@@ -111,6 +104,13 @@ Larger binaries, but easy to deploy.
 Build and run anywhere.
 
 Easy cross-platform compilation.
+
+* Fast builds
+
+Focus on work
+
+.image workshop/xkcd_compiling.png
+.caption [[https://xkcd.com/303/][xkcd]]
 
 * Great tooling
 
@@ -195,51 +195,43 @@ Publish code to github, gitlab, bitbucket etc.
 
 It should be now "go gettable".
 
-Install:
-
-	$ go get -u github.com/kardianos/govendor
+	$ nocontent -h
+	-bash: nocontent: command not found
+	
+	$ go get github.com/tg/nocontent
+	
+	$ nocontent -h
+	Usage: nocontent [options] [path ...]
 	...
-	$ govendor -version
-	v1.0.7
 
-Placed in your $GOPATH:
+Placed in your $GOPATH (which by default is at `$HOME/go/`):
 
-	$ which govendor
-	/Users/tg/dev/go/bin/govendor
-
-	$ echo $GOPATH
-	/Users/tg/dev/go
-
+	$ which nocontent
+	/Users/tg/go/bin/nocontent
 
 * Everything is on GitHub
 
-.image workshop/github_by_lang.png
-
-* Trendy
-
-.image workshop/trend.png
-.caption Google Trends for [[http://www.google.com/trends/explore#q=golang][golang]]
+.image workshop/github_go_search.png
 
 * Many users
 
-- Google
-- Facebook, Twitter
-- Dropbox
-- GitHub, Bitbucket
-- Digital Ocean, Heroku, Kubernetes, CoreOS, Docker
-- eBay, SoundCloud, Tumblr
-- GOV.UK
-- New York Times,
-- Mozilla
-- ...
+Google,
+Facebook, Twitter,
+Dropbox, GitHub, Bitbucket
+Digital Ocean, Heroku, Kubernetes, Docker,
+eBay, SoundCloud, Tumblr, GOV.UK, New York Times,
+Mozilla, Allegro, ...
 
 .link http://golang.org/wiki/GoUsers
 
-* Why NOT use Go?
+* Why NOT to use Go?
 
-Because you don't like it?
-
-You'll figure it out.
+- it's weird
+- too simple for great minds
+- it's from Google, not Apple
+- no <templates>
+- will I find a job?
+- Node
 
 * Sounds good, give me some code!
 
@@ -254,11 +246,13 @@ Projects should live within `$GOPATH/src`.
 
 Worth adding `$GOPATH/bin` to `$PATH`.
 
+By default `$GOTPATH` is at `$HOME/go`.
+
 
 * Install
 
 - [[golang.org/doc/install]]
-- or use package manager
+- or just use a package manager (apt, yum, brew)
 
 * Hello world
 
@@ -286,7 +280,12 @@ Worth adding `$GOPATH/bin` to `$PATH`.
 
 * Capture request body
 
-.play workshop/http_copy_string.go /ServeHTTP/,/^}/
+[[https://golang.org/pkg/net/http/#Request]]
+
+
+In action:
+
+.play workshop/http_read_body.go /ServeHTTP/,/^}/
 
 * Parsing URL
 
@@ -294,53 +293,43 @@ Package [[https://golang.org/pkg/net/url][net/url]] for manipulating URLs of the
 
 	scheme://[userinfo@]host/path[?query][#fragment]
 
+Access URL from the Request:
+
+	type Request struct {
+		...
+		URL *url.URL
+
 Access `query` within URL:
 
 	func (u *URL) Query() Values
 
-Parse raw query:
+Get a specific value:
 
-	q, err := url.ParseQuery("user=bob%20marley&pass=green123")
+	// "user=bob%20marley&age=36"
+	q := r.URL.Query()
 	user := q.Get("user") // "bob marley"
 
 * Logging
 
 .play workshop/logging.go
 
-* Environment variables
-
-.play workshop/env.go
-
-* JSON marshaler
-
-.play workshop/json_marshal.go
-
-* JSON encoder
-
-.play workshop/json_encoder.go
-
-* JSON fields
-
-.play workshop/json_fields.go
-
-* Enough! I want my bot!
+* Enough! I want my server up and running!
 
 * Coding Round 1
 
 Requirements:
 
-- HTTP server listening on `$BOT_ADDR` if present (e.g. "localhost:1234")
-- API compatible with [[https://api.slack.com/outgoing-webhooks]]
-- Make them gentlemen (🎩)
+- HTTP server running on localhost
+- Endpoint counting number of words passed in the body
 
 Extras:
-- Token validation for incoming requests ($BOT_TOKEN)
+
 - Logging (who when what)
-- Error handling (e.g. 400 Bad Request on invalid input data)
+- Customisable word delimiters via URL query parameter
 
 Packages:
 
-- [[https://golang.org/pkg/net/http][net/http]], [[https://golang.org/pkg/net/url][net/url]], [[https://golang.org/pkg/encoding/json][encoding/json]], [[https://golang.org/pkg/log][log]], [[https://golang.org/pkg/fmt][fmt]], [[https://golang.org/pkg/bytes][bytes]], [[https://golang.org/pkg/strings][strings]]
+- [[https://golang.org/pkg/net/http][net/http]], [[https://golang.org/pkg/net/url][net/url]], [[https://golang.org/pkg/log][log]], [[https://golang.org/pkg/fmt][fmt]], [[https://golang.org/pkg/bytes][bytes]], [[https://golang.org/pkg/strings][strings]]
 
 * Testing Go code
 
@@ -508,9 +497,7 @@ Not run by default, needs a flag:
 
 Requirements:
 
-- Write unit test for your handler (and make it `PASS`)
-- Deploy to server
-- Enjoy your bot
+- Write a unit test for your handler (and make it `PASS`)
 
 Extras:
 
@@ -520,25 +507,6 @@ Extras:
 Packages:
 
 - [[https://golang.org/pkg/testing][testing]], [[https://golang.org/pkg/testing/httptest][testing/httptest]]
-
-* Deployment
-
-Get your endpoint from Slack:
-
-	/iwantmybox
-
-Build for the right platform:
-
-	$ GOOS=linux GOARCH=amd64 go build -v
-
-Deploy:
-
-	$ scp mybot workshop.x7467.com:
-
-Run:
-
-	$ ssh workshop
-	workshop$ ./mybot
 
 * Making an HTTP request
 
@@ -593,7 +561,7 @@ Status code `404` if word doesn't exists.
 
 * Spawning a goroutine
 
-.play workshop/goroutine.go
+.play -edit workshop/goroutine.go
 
 Goroutines terminates on exit (main goroutine).
 
@@ -603,7 +571,7 @@ Goroutines terminates on exit (main goroutine).
 
 * Watch out bindings of variables
 
-.play workshop/goroutine_binding.go /func/,$
+.play -edit workshop/goroutine_binding.go /func/,$
 
 Tiger ate everyone?
 
@@ -613,7 +581,7 @@ Tiger ate everyone?
 
 * Collecting from workers
 
-.play workshop/channel_collect.go /func/,$
+.play -edit workshop/channel_collect.go /func/,$
 
 * Ticker
 
