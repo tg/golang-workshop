@@ -58,19 +58,6 @@ func (s *HTTPSynonymizer) Synonyms(word string) ([]string, error) {
 	return parsed.Synonyms, err
 }
 
-// ReplaceWord will get synonyms for a word using Synonymizer and will return first one if any found.
-// Otherwise the same word will be returned (including on errors).
-func ReplaceWord(s Synonymizer, word string) (newWord string, err error) {
-	newWord = word
-	syns, err := s.Synonyms(word)
-
-	if len(syns) > 0 {
-		newWord = syns[0]
-	}
-
-	return
-}
-
 // DefaultWordMatcher is a regular expression matching words
 var DefaultWordMatcher = regexp.MustCompile(`\w+`)
 
