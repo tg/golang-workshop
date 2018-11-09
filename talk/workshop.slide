@@ -516,6 +516,10 @@ Packages:
 
 .play workshop/http_request_timeout.go /func/,$
 
+* Reading JSON
+
+.play workshop/json_decoder.go /code_begin/,$
+
 * String manipulation
 
 Package [[https://golang.org/pkg/strings][strings]] contains string "methods".
@@ -540,7 +544,7 @@ Extras:
 
 Packages:
 
-- [[https://golang.org/pkg/net/http][net/http]], [[https://golang.org/pkg/bytes][bytes]], [[https://golang.org/pkg/strings][strings]]
+- [[https://golang.org/pkg/net/http][net/http]], [[https://golang.org/pkg/encoding/json][encoding/json]], [[https://golang.org/pkg/bytes][bytes]], [[https://golang.org/pkg/strings][strings]]
 
 * Dictionary
 
